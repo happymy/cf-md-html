@@ -101,7 +101,7 @@ function loadFile(file) {
 
 inputEl.addEventListener('input', () => {
   clearTimeout(inputEl._timer);
-  inputEl._timer = setTimeout(render, 150);
+  inputEl._timer = setTimeout(() => requestAnimationFrame(render), 300);
 });
 
 document.getElementById('open-btn').addEventListener('click', () => fileInput.click());
