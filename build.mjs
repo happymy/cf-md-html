@@ -19,7 +19,7 @@ async function main() {
 
   const css = await readFile('src/styles.css', 'utf-8');
   let html = await readFile(TEMPLATE, 'utf-8');
-  html = html.replace('__INLINE_CSS__', css.replace(/\n/g, ''));
+  html = html.replace('__INLINE_CSS__', css.replace(/[\r\n]/g, ''));
   html = html.replace('__INLINE_JS__', js.outputFiles[0].text);
 
   let worker = await readFile(WORKER_SRC, 'utf-8');

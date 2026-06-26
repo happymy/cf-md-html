@@ -89,10 +89,10 @@ markdown-it.parse(content) → tokens → HTML
 
 - Worker 不记录任何请求日志
 - 无 Cookie 设置
-- 无第三方资源加载（markdown-it / highlight.js 打包进 HTML）
-- 不采集 IP / User-Agent
+- 无第三方资源加载（markdown-it / highlight.js 打包进 HTML；Mermaid 因体积 3.8MB 无法内联，例外地从 CDN 动态加载）
+- 不采集 IP / User-Agent（注：Mermaid CDN 加载会暴露用户 IP，属已知例外）
 - 响应头设 `X-Content-Type-Options: nosniff` `Referrer-Policy: no-referrer`
-- CSP 限制到最小权限（仅内联 script 和 style）
+- CSP 限制到最小权限（内联 script/style + Mermaid CDN 白名单）
 
 ## 项目结构
 
@@ -118,5 +118,5 @@ md-reader/
 4. 浅色/深色切换正常
 5. **复杂语法**：表格、脚注、嵌套列表、围栏代码块、删除线、URL 自动链接均渲染正确
 6. 刷新页面或关闭重开 → 数据消失（无持久化）
-7. 浏览器 DevTools 无 Cookie、无外部请求
+7. 浏览器 DevTools 无 Cookie、除 Mermaid CDN 外无外部请求
 8. Lighthouse 无隐私 / 安全告警

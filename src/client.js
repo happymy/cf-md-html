@@ -1,6 +1,7 @@
 import markdownit from 'markdown-it';
 import footnote from 'markdown-it-footnote';
 import taskLists from 'markdown-it-task-lists';
+import strikethrough from 'markdown-it-strikethrough-alt';
 import hljs from 'highlight.js/lib/core';
 import javascript from 'highlight.js/lib/languages/javascript';
 import typescript from 'highlight.js/lib/languages/typescript';
@@ -26,7 +27,7 @@ hljs.registerLanguage('sql', sql);
 hljs.registerLanguage('markdown', markdown);
 
 function escapeAttr(s) {
-  return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return s.replace(/[&"<>]/g, c => ({ '&': '&amp;', '"': '&quot;', '<': '&lt;', '>': '&gt;' })[c]);
 }
 
 const md = markdownit({
@@ -34,6 +35,9 @@ const md = markdownit({
   linkify: true,
   typographer: true,
   highlight(str, lang) {
+    if (lang === 'mermaid') {
+      return `<pre class="mermaid">${md.utils.escapeHtml(str)}</pre>`;
+    }
     if (lang && hljs.getLanguage(lang)) {
       try {
         return `<pre><code class="hljs language-${escapeAttr(lang)}">${hljs.highlight(str, { language: lang, ignoreIllegals: true }).value}</code></pre>`;
@@ -44,6 +48,7 @@ const md = markdownit({
 });
 md.use(footnote);
 md.use(taskLists);
+md.use(strikethrough);
 
 const inputEl = document.getElementById('input');
 const previewEl = document.getElementById('preview');
@@ -51,10 +56,31 @@ const themeBtn = document.getElementById('theme-btn');
 const fileInput = document.getElementById('file-input');
 const dropZone = document.getElementById('drop-zone');
 const divider = document.getElementById('divider');
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 function render() {
   const html = md.render(inputEl.value);
   previewEl.innerHTML = html;
+  if (previewEl.querySelector('.mermaid') && window.mermaid) {
+    mermaid.run({ querySelector: '.mermaid', suppressErrors: true });
+  }
+}
+
+function loadMermaid() {
+  const s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js';
+  s.onload = () => {
+    mermaid.initialize({ startOnLoad: false, suppressErrors: true, theme: mermaidTheme() });
+    if (previewEl.querySelector('.mermaid')) {
+      mermaid.run({ querySelector: '.mermaid', suppressErrors: true });
+    }
+  };
+  document.head.appendChild(s);
+}
+loadMermaid();
+
+function mermaidTheme() {
+  return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default';
 }
 
 function isMdFile(file) {
@@ -62,12 +88,13 @@ function isMdFile(file) {
 }
 
 function loadFile(file) {
+  if (file.size > MAX_FILE_SIZE) { inputEl.value = '# 文件过大（最大 5MB）'; render(); return; }
   const reader = new FileReader();
   reader.onload = () => {
     inputEl.value = reader.result;
     render();
   };
-  reader.onerror = () => {};
+  reader.onerror = () => { inputEl.value = '# 读取文件失败'; render(); };
   reader.readAsText(file);
 }
 
@@ -75,7 +102,7 @@ inputEl.addEventListener('input', render);
 
 document.getElementById('open-btn').addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', (e) => {
-  if (e.target.files[0]) loadFile(e.target.files[0]);
+  if (e.target.files[0] && isMdFile(e.target.files[0])) loadFile(e.target.files[0]);
 });
 
 dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
@@ -94,6 +121,7 @@ document.addEventListener('paste', (e) => {
   if (text && !e.target.closest('#input')) {
     inputEl.value = text;
     render();
+    inputEl.focus();
   }
 });
 
@@ -108,6 +136,10 @@ const mq = window.matchMedia('(prefers-color-scheme: dark)');
 function setTheme(dark) {
   document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
   themeBtn.textContent = dark ? '☀️' : '🌙';
+  if (window.mermaid) {
+    mermaid.initialize({ startOnLoad: false, suppressErrors: true, theme: mermaidTheme() });
+    render();
+  }
 }
 setTheme(mq.matches);
 mq.addEventListener('change', (e) => setTheme(e.matches));
@@ -130,6 +162,7 @@ document.addEventListener('mousemove', (e) => {
   el.style.width = pct + '%';
 });
 document.addEventListener('mouseup', () => { isDragging = false; });
+document.addEventListener('mouseleave', () => { isDragging = false; });
 
 document.getElementById('toggle-panel-btn').addEventListener('click', () => {
   document.querySelector('.main').classList.toggle('left-hidden');
