@@ -88,17 +88,21 @@ function isMdFile(file) {
 }
 
 function loadFile(file) {
-  if (file.size > MAX_FILE_SIZE) { inputEl.value = '# 文件过大（最大 5MB）'; render(); return; }
+  if (file.size > MAX_FILE_SIZE) { clearTimeout(inputEl._timer); inputEl.value = '# 文件过大（最大 5MB）'; render(); return; }
   const reader = new FileReader();
   reader.onload = () => {
+    clearTimeout(inputEl._timer);
     inputEl.value = reader.result;
     render();
   };
-  reader.onerror = () => { inputEl.value = '# 读取文件失败'; render(); };
+  reader.onerror = () => { clearTimeout(inputEl._timer); inputEl.value = '# 读取文件失败'; render(); };
   reader.readAsText(file);
 }
 
-inputEl.addEventListener('input', render);
+inputEl.addEventListener('input', () => {
+  clearTimeout(inputEl._timer);
+  inputEl._timer = setTimeout(render, 150);
+});
 
 document.getElementById('open-btn').addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', (e) => {
@@ -119,6 +123,7 @@ document.addEventListener('paste', (e) => {
   if (file && isMdFile(file)) { loadFile(file); return; }
   const text = e.clipboardData.getData('text');
   if (text && !e.target.closest('#input')) {
+    clearTimeout(inputEl._timer);
     inputEl.value = text;
     render();
     inputEl.focus();
