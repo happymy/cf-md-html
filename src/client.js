@@ -50,6 +50,7 @@ const previewEl = document.getElementById('preview');
 const themeBtn = document.getElementById('theme-btn');
 const fileInput = document.getElementById('file-input');
 const dropZone = document.getElementById('drop-zone');
+const divider = document.getElementById('divider');
 
 function render() {
   const html = md.render(inputEl.value);
@@ -103,8 +104,33 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+const mq = window.matchMedia('(prefers-color-scheme: dark)');
+function setTheme(dark) {
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  themeBtn.textContent = dark ? '☀️' : '🌙';
+}
+setTheme(mq.matches);
+mq.addEventListener('change', (e) => setTheme(e.matches));
+
 themeBtn.addEventListener('click', () => {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  themeBtn.textContent = isDark ? '🌙' : '☀️';
+  setTheme(!isDark);
+});
+
+let isDragging = false;
+divider.addEventListener('mousedown', (e) => { isDragging = true; e.preventDefault(); });
+document.addEventListener('mousemove', (e) => {
+  if (!isDragging) return;
+  const rect = dropZone.getBoundingClientRect();
+  let pct = ((e.clientX - rect.left) / rect.width) * 100;
+  if (pct < 20) pct = 20;
+  if (pct > 80) pct = 80;
+  const el = document.querySelector('.panel:first-child');
+  el.style.flex = 'none';
+  el.style.width = pct + '%';
+});
+document.addEventListener('mouseup', () => { isDragging = false; });
+
+document.getElementById('toggle-panel-btn').addEventListener('click', () => {
+  document.querySelector('.main').classList.toggle('left-hidden');
 });

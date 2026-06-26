@@ -86,7 +86,10 @@ header button:hover { background: var(--code-bg); }
   overflow: hidden;
 }
 
-.panel + .panel { border-left: 1px solid var(--border); }
+#divider { width: 4px; cursor: col-resize; background: var(--border); flex-shrink: 0; user-select: none; }
+#divider:hover { background: var(--accent); }
+.main.left-hidden .panel:first-child,
+.main.left-hidden #divider { display: none; }
 
 .panel-label {
   padding: 6px 12px;
@@ -122,5 +125,7 @@ header button:hover { background: var(--code-bg); }
 @media (max-width: 768px) {
   .main { flex-direction: column; }
   .panel + .panel { border-left: none; border-top: 1px solid var(--border); }
+  #divider { display: none; }
   #preview { padding: 16px; }
+  #toggle-panel-btn { display: none; }
 }
