@@ -1,0 +1,126 @@
+:root, [data-theme="light"] {
+  --bg: #fff;
+  --fg: #24292f;
+  --border: #d0d7de;
+  --accent: #0969da;
+  --code-bg: #f6f8fa;
+  --preview-bg: #fff;
+  --input-bg: #f6f8fa;
+}
+
+[data-theme="dark"] {
+  --bg: #0d1117;
+  --fg: #c9d1d9;
+  --border: #30363d;
+  --accent: #58a6ff;
+  --code-bg: #161b22;
+  --preview-bg: #0d1117;
+  --input-bg: #161b22;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+header h1 { font-size: 16px; font-weight: 600; flex: 1; }
+
+header button {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  color: var(--fg);
+  font-size: 13px;
+}
+
+header button:hover { background: var(--code-bg); }
+
+#drop-zone {
+  flex: 1;
+  display: flex;
+  position: relative;
+}
+
+#drop-zone.dragover::after {
+  content: '📄 释放文件以打开';
+  position: absolute;
+  inset: 8px;
+  border: 2px dashed var(--accent);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(9, 105, 218, 0.08);
+  font-size: 18px;
+  z-index: 10;
+  backdrop-filter: blur(2px);
+}
+
+.main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panel + .panel { border-left: 1px solid var(--border); }
+
+.panel-label {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6e7681;
+  border-bottom: 1px solid var(--border);
+  background: var(--code-bg);
+}
+
+#input {
+  flex: 1;
+  border: none;
+  outline: none;
+  resize: none;
+  padding: 16px;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  background: var(--input-bg);
+  color: var(--fg);
+}
+
+#preview {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 32px;
+  background: var(--preview-bg);
+}
+
+@media (max-width: 768px) {
+  .main { flex-direction: column; }
+  .panel + .panel { border-left: none; border-top: 1px solid var(--border); }
+  #preview { padding: 16px; }
+}

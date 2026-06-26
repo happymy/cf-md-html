@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MD Reader</title>
+<style>__INLINE_CSS__</style>
+</head>
+<body>
+<header>
+  <h1>MD Reader</h1>
+  <button id="open-btn">📂 打开</button>
+  <button id="theme-btn">🌙</button>
+</header>
+<div id="drop-zone">
+  <div class="main">
+    <div class="panel">
+      <div class="panel-label">Markdown</div>
+      <textarea id="input" placeholder="在此粘贴 Markdown，或拖入 .md 文件&#10;&#10;支持 GFM：表格、脚注、删除线、任务列表..."></textarea>
+    </div>
+    <div class="panel">
+      <div class="panel-label">Preview</div>
+      <div id="preview"></div>
+    </div>
+  </div>
+</div>
+<input type="file" id="file-input" accept=".md" hidden>
+<script>__INLINE_JS__</script>
+</body>
+</html>
