@@ -2,6 +2,10 @@ import markdownit from 'markdown-it';
 import footnote from 'markdown-it-footnote';
 import taskLists from 'markdown-it-task-lists';
 import strikethrough from 'markdown-it-strikethrough-alt';
+import deflist from 'markdown-it-deflist';
+import abbr from 'markdown-it-abbr';
+import sup from 'markdown-it-sup';
+import sub from 'markdown-it-sub';
 import hljs from 'highlight.js/lib/core';
 import javascript from 'highlight.js/lib/languages/javascript';
 import typescript from 'highlight.js/lib/languages/typescript';
@@ -49,6 +53,10 @@ const md = markdownit({
 md.use(footnote);
 md.use(taskLists);
 md.use(strikethrough);
+md.use(deflist);
+md.use(abbr);
+md.use(sup);
+md.use(sub);
 
 const inputEl = document.getElementById('input');
 const previewEl = document.getElementById('preview');
@@ -59,6 +67,7 @@ const divider = document.getElementById('divider');
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 function render() {
+  if (inputEl.value.includes('```mermaid') && !window.mermaid) loadMermaid();
   const html = md.render(inputEl.value);
   previewEl.innerHTML = html;
   if (previewEl.querySelector('.mermaid') && window.mermaid) {
@@ -66,18 +75,22 @@ function render() {
   }
 }
 
+let mermaidLoading = false;
 function loadMermaid() {
+  if (mermaidLoading || window.mermaid) return;
+  mermaidLoading = true;
   const s = document.createElement('script');
   s.src = 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js';
   s.onload = () => {
+    mermaidLoading = false;
     mermaid.initialize({ startOnLoad: false, suppressErrors: true, theme: mermaidTheme() });
     if (previewEl.querySelector('.mermaid')) {
       mermaid.run({ querySelector: '.mermaid', suppressErrors: true });
     }
   };
+  s.onerror = () => { mermaidLoading = false; };
   document.head.appendChild(s);
 }
-loadMermaid();
 
 function mermaidTheme() {
   return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default';
