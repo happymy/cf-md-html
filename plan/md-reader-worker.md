@@ -44,8 +44,9 @@
 
 ### V2（可选）
 - [x] 快捷键（Ctrl+O 打开文件等）
-- [x] Mermaid 流程图渲染（CDN 动态加载）
+- [x] Mermaid 流程图渲染（CDN 按需动态加载，非首次请求）
 - [x] 编辑防抖（300ms + requestAnimationFrame，解决大文档卡顿）
+- [x] 定义列表 / 缩写 / 上标 / 下标语法
 - [ ] 导出为 HTML
 - [ ] 分享（URL hash 编码内容，不经过服务端）
 - [ ] TOC 目录导航
